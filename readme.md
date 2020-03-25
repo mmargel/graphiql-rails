@@ -51,6 +51,13 @@ You can override `GraphiQL::Rails.config` values in an initializer (eg, `config/
     ```
 
 ### Development
-
 - Tests: `rake test`
 - Update GraphiQL & dependencies: `rake update_graphiql`
+
+Note: In order to run `rake update_graphiql`, this project and `graphiql` must be placed under the same parent directory:
+
+```
+some_parent_dir
+  |- graphiql
+  |- graphiql-rails
+```
