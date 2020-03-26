@@ -47,10 +47,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   // Defines a GraphQL fetcher using the fetch API.
   var graphQLEndpoint = graphiqlContainer.dataset.graphqlEndpointPath;
-  function graphQLFetcher(graphQLParams) {
+  function graphQLFetcher(graphQLParams, headers = {}) {
     return fetch(graphQLEndpoint, {
       method: 'post',
-      headers: JSON.parse(graphiqlContainer.dataset.headers),
+      headers: Object.assign(headers, JSON.parse(graphiqlContainer.dataset.headers)),
       body: JSON.stringify(graphQLParams),
       credentials: 'include',
     }).then(function(response) {

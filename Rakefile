@@ -21,14 +21,15 @@ task :update_graphiql do
   def replace_versions(path, new_versions)
     old_contents = File.read(path)
     new_contents = new_versions.reduce(old_contents) do |contents, (package, new_version)|
-      contents.gsub(/#{package}-\d+\.\d+\.\d+/, "#{package}-#{new_version}")
+      version_slug = /\d|alpha|beta|\.|\-/
+      contents.gsub(/#{package}-#{version_slug}+/, "#{package}-#{new_version}")
     end
     File.write(path, new_contents)
   end
 
-  def npm_version(package_json_path)
-    npm_config = JSON.parse(File.read(package_json_path))
-    npm_config["version"]
+  def yarn_version(package_json_path)
+    yarn_config = JSON.parse(File.read(package_json_path))
+    yarn_config["version"]
   end
 
   update_path = "./graphiql_update"
@@ -39,11 +40,10 @@ task :update_graphiql do
 
   FileUtils.mkdir_p(update_path)
   FileUtils.cd(update_path) do
-    sh("npm init --force")
-    sh("npm install graphiql react react-dom")
+    sh("yarn add react react-dom ../../graphiql/packages/graphiql")
 
     FileUtils.cd("./node_modules/graphiql") do
-      new_version = npm_version("./package.json")
+      new_version = yarn_version("./package.json")
       new_js_versions["graphiql"] = new_version
       new_css_versions["graphiql"] = new_version
 
@@ -53,7 +53,7 @@ task :update_graphiql do
     end
 
     FileUtils.cd("./node_modules/react") do
-      new_version = npm_version("./package.json")
+      new_version = yarn_version("./package.json")
       new_js_versions["react"] = new_version
 
       puts "Copying React #{new_version}"
@@ -62,7 +62,7 @@ task :update_graphiql do
     end
 
     FileUtils.cd("./node_modules/react-dom") do
-      new_version = npm_version("./package.json")
+      new_version = yarn_version("./package.json")
       new_js_versions["react-dom"] = new_version
 
       puts "Copying ReactDOM #{new_version}"
@@ -75,5 +75,5 @@ task :update_graphiql do
   puts "Updating manifests"
   replace_versions(js_manifest_path, new_js_versions)
   replace_versions(css_manifest_path, new_css_versions)
-  # FileUtils.rm_rf(update_path)
+  FileUtils.rm_rf(update_path)
 end
