@@ -21,7 +21,7 @@ task :update_graphiql do
   def replace_versions(path, new_versions)
     old_contents = File.read(path)
     new_contents = new_versions.reduce(old_contents) do |contents, (package, new_version)|
-      version_slug = /\d|alpha|beta|\.|\-/
+      version_slug = /\d|alpha|beta|headers?|\.|\-/
       contents.gsub(/#{package}-#{version_slug}+/, "#{package}-#{new_version}")
     end
     File.write(path, new_contents)
